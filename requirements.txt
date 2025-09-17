@@ -1,0 +1,5 @@
+flask==2.3.3
+flask-cors==4.0.0
+langchain==0.0.287
+openai==0.28.0
+# 添加您的其他依赖
