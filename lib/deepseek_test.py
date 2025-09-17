@@ -27,7 +27,9 @@ from typing import Any
 from IPython.display import display, Markdown #在jupyter显示信息的工具
 
 langchain.debug = False
-
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+model_dir = os.path.join(parent_dir, 'model')
+sys.path.append(model_dir)
 sys.path.append('../..')
 
 pn.extension()
@@ -72,8 +74,10 @@ llm = ChatOpenAI(temperature=0,
 delimiter = "####"
 
 try:
+    # 使用绝对路径加载blog_files
+    blog_files_path = os.path.join(parent_dir, 'blog_files')
     loader = DirectoryLoader(
-        path='./blog_files',
+        path=blog_files_path,
         glob='**/*.md',
         loader_cls=UnstructuredMarkdownLoader,
         loader_kwargs={'encoding': 'utf-8', 'mode': 'elements'},  # 增加模式参数
@@ -84,7 +88,8 @@ try:
     print(f"成功加载 {len(data)} 个文档片段")
 except Exception as e:
     print(f"文档加载失败: {str(e)}")
-    sys.exit(1)
+    # 不退出，而是创建一个空的数据列表继续运行
+    data = []
 
 template = """基于以下文档内容，生成一个问题及其答案：\
 {doc}\
@@ -116,7 +121,7 @@ class MyQAGenerateChain(QAGenerateChain):
 example_gen_chain = MyQAGenerateChain.from_llm(llm)
 
 
-embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-large-zh-v1.5") #初始化
+embeddings = HuggingFaceEmbeddings(model_name=model_dir) #初始化
 
 vectorstore_path = "faiss_index"
 if os.path.exists(vectorstore_path) and os.path.isdir(vectorstore_path):
