@@ -22,6 +22,7 @@ from langchain_community.document_loaders import UnstructuredMarkdownLoader,Dire
 from langchain_community.vectorstores import FAISS
 
 import pickle
+import frontmatter
 
 from typing import Any
 from IPython.display import display, Markdown #在jupyter显示信息的工具
@@ -82,10 +83,42 @@ try:
         loader_cls=UnstructuredMarkdownLoader,
         loader_kwargs={'encoding': 'utf-8', 'mode': 'elements'},  # 增加模式参数
         show_progress=True,
-        silent_errors=True  # 忽略错误文件
+        silent_errors=True,  # 忽略错误文件
+        use_multithreading=True
     )
     data = loader.load()
+    
+    # 创建字典存储每个文件的categories信息
+    file_categories = {}
+    
+    # 获取所有唯一的md文件路径
+    md_files = set()
+    for doc in data:
+        source_path = doc.metadata['source']
+        if source_path.endswith('.md'):
+            md_files.add(source_path)
+    
+    # 解析每个md文件的前言部分获取categories
+    for md_file in md_files:
+        try:
+            with open(md_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            post = frontmatter.loads(content)
+            categories = post.metadata.get('categories', '未分类')
+            file_categories[md_file] = categories
+        except Exception as e:
+            print(f"解析文件 {md_file} 的前言失败: {str(e)}")
+            file_categories[md_file] = '未分类'
+    
+    # 为每个文档片段添加categories信息
+    for doc in data:
+        source_path = doc.metadata['source']
+        doc.metadata['last_modified'] = os.path.getmtime(source_path)  # 记录文件修改时间
+        # 添加categories信息到元数据
+        doc.metadata['file_categories'] = file_categories.get(source_path, '未分类')
+    
     print(f"成功加载 {len(data)} 个文档片段")
+    print(f"解析了 {len(file_categories)} 个文件的categories信息")
 except Exception as e:
     print(f"文档加载失败: {str(e)}")
     # 不退出，而是创建一个空的数据列表继续运行
@@ -132,6 +165,29 @@ if os.path.exists(vectorstore_path) and os.path.isdir(vectorstore_path):
             allow_dangerous_deserialization=True
         )
         print("成功加载现有向量数据库")
+
+        existing_files = {doc.metadata['source'] for doc in vectorstore.docstore._dict.values()}
+        current_files = {doc.metadata['source'] for doc in data}
+        new_files = current_files - existing_files
+        modified_files = set()
+
+        for doc in data:
+            source = doc.metadata['source']
+            if source in existing_files:
+                existing_doc = next(d for d in vectorstore.docstore._dict.values() 
+                                   if d.metadata['source'] == source)
+                if doc.metadata['last_modified'] > existing_doc.metadata.get('last_modified', 0):
+                    modified_files.add(source)
+        
+        if new_files or modified_files:
+            updated_docs = [doc for doc in data 
+                           if doc.metadata['source'] in (new_files | modified_files)]
+            vectorstore.add_documents(updated_docs)
+            print(f"🆕 增量更新 {len(updated_docs)} 个文档片段")
+            vectorstore.save_local(vectorstore_path)
+        else:
+            print("⏩ 未检测到文件变更，无需更新")
+
     except:
         print("向量数据库损坏，重建中...")
         vectorstore = None
@@ -178,11 +234,18 @@ def ask_question(question: str):
         result = qa.invoke({"query": question})
         answer = result["result"]
         
-        # 显示来源文档
-        sources = "\n\n来源文档:\n" + "\n".join(
-            f"- {doc.metadata['source']} (页 {doc.metadata.get('page', 'N/A')})" 
-            for doc in result["source_documents"]
-        )
+        # 显示来源文档 - 使用更合适的元数据字段
+        sources_list = []
+        for doc in result["source_documents"]:
+            # 使用文件名而不是完整路径
+            filename = doc.metadata.get('filename', os.path.basename(doc.metadata.get('source', '未知文件')))
+            
+            # 使用文件中的categories字段信息
+            category = doc.metadata.get('file_categories', '未分类')
+            
+            sources_list.append(f"- {filename} ({category})")
+        
+        sources = "\n\n来源文档:\n" + "\n".join(sources_list)
         
         return answer + sources
     except Exception as e:

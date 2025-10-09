@@ -6,3 +6,21 @@ venv/
 .DS_Store
 .vercel/
 model/
+# Large files and directories
+*.bin
+*.pth
+*.pt
+*.h5
+*.hdf5
+*.tar.gz
+*.zip
+*.rar
+*.7z
+# Log files
+*.log
+logs/
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/

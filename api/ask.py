@@ -1,20 +1,96 @@
-# ask.py
+# ask.py - 集成WebSocket联系服务的FastAPI应用
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
 import sys
+import json
+import uuid
+from datetime import datetime
 
 # 添加lib目录到Python路径
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 lib_dir = os.path.join(parent_dir, 'lib')
 sys.path.append(lib_dir)
 
-# 从lib/deepseek_test.py导入ask_question函数
-from deepseek_test import ask_question
+# 从新的模块化结构导入ask_question函数
+# from deepseek_main import ask_question  # 在函数内部导入以避免循环导入
 
-app = FastAPI()
+app = FastAPI(title="博客问答系统", description="集成WebSocket联系服务的问答API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 生产环境建议替换为具体域名，如 ["http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],  # 允许所有方法，包括 OPTIONS
+    allow_headers=["*"],  # 允许所有请求头
+)
+
+# WebSocket连接管理器
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: dict[str, WebSocket] = {}
+        self.contact_requests: dict[str, dict] = {}
+
+    async def connect(self, websocket: WebSocket, client_id: str):
+        await websocket.accept()
+        self.active_connections[client_id] = websocket
+        
+        # 发送连接确认
+        await self.send_personal_message({
+            "type": "connection_established",
+            "message": "WebSocket连接已建立",
+            "client_id": client_id,
+            "timestamp": datetime.now().isoformat()
+        }, client_id)
+
+    def disconnect(self, client_id: str):
+        if client_id in self.active_connections:
+            del self.active_connections[client_id]
+
+    async def send_personal_message(self, message: dict, client_id: str):
+        if client_id in self.active_connections:
+            await self.active_connections[client_id].send_text(json.dumps(message))
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections.values():
+            await connection.send_text(json.dumps(message))
+    
+
+
+# 创建全局连接管理器
+manager = ConnectionManager()
+
+# WebSocket联系端点 - 处理前端联系请求
+@app.websocket("/contact")
+async def websocket_contact_endpoint(websocket: WebSocket):
+    client_id = str(uuid.uuid4())
+    await manager.connect(websocket, client_id)
+    
+    try:
+        while True:
+            # 接收消息
+            data = await websocket.receive_text()
+    
+            message_data = json.loads(data)
+
+            response = {
+                "type": "message",
+                "message": f"服务端收到你的消息: {message_data.get('message', '')}",
+                "timestamp": datetime.now().isoformat()
+            }
+            await websocket.send_text(json.dumps(response))  
+    
+    except WebSocketDisconnect:
+        manager.disconnect(client_id)
+        print(f"客户端 {client_id} 断开连接")
+    except Exception as e:
+        manager.disconnect(client_id)
+        print(f"WebSocket连接处理错误: {e}")
+
+
 
 # 添加一个简单的测试端点
 @app.get("/test")
@@ -36,12 +112,15 @@ async def ask(request: Request):
             # 这是客户端的错误，不是服务器的错误
             raise HTTPException(status_code=400, detail="No question provided in the request body.")
         
-        # 4. 调用你的 RAG 函数
+        # 4. 导入问答函数
+        from deepseek_main import ask_question
+        
+        # 5. 调用你的 RAG 函数
         print(f"Calling ask_question with: {question}")  # 调试信息
         answer = ask_question(question)
         print(f"Received answer: {answer}")  # 调试信息
         
-        # 5. 返回成功的响应
+        # 6. 返回成功的响应
         return {"answer": answer}
 
     except HTTPException as http_exc:
@@ -59,7 +138,6 @@ async def ask(request: Request):
             content={"detail": f"An unexpected server error occurred: {str(e)}"}
         )
 
-# Vercel需要这个变量
 app = app
 
 # 用于本地运行
