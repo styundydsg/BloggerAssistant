@@ -24,3 +24,4 @@ logs/
 *.temp
 temp/
 tmp/
+blog_files/

@@ -1,7 +1,7 @@
 ---
 title: 关于鸿蒙mini系统编译不过的问题的个人解决方案
 date: 2025-05-23 20:50:03
-tags: 
+tags: 解决方案
 categories: OpenHarmony
 ---
 

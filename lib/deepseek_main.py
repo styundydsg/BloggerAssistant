@@ -1,9 +1,9 @@
 """主入口文件 - 提供简洁的API接口"""
 
-from modules.main import ask_question, get_completion_from_messages, initialize_system
+from modules.main import ask_question,initialize_system
 
 # 导出主要功能
-__all__ = ['ask_question', 'get_completion_from_messages', 'initialize_system']
+__all__ = ['ask_question', 'initialize_system']
 
 # 命令行接口
 if __name__ == "__main__":

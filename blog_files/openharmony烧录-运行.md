@@ -5,17 +5,16 @@ tags:
 categories: OpenHarmony
 ---
 ### 关键语句
-ready to load at 0x10a000 ccccccccccload fail 0xc35a69a6 ready  
-Wait SELoadr ACK overtime Wait connect success flag (hisilicon) overtime.  
-AT指令无返回  
-
-
-
-HiBurn  
-烧录的时候使用OHOS_Image.bin,文档是刚开始看是选择两个的，其中是选择一个整合好的，应该是文档漏了。  
-
-
-AT指令的运行是在一个工具下的，如IPOP  
-运行的时候他们说要发送AT指令，如果后面不加回车的话会没有反应。  
-可能不同的串口调试助手不一样。  
+*   **启动与加载失败**
+    `ready to load at 0x10a000 ccccccccccload fail 0xc35a69a6 ready`
+    `Wait SELoadr ACK overtime Wait connect success flag (hisilicon) overtime.`
+*   **AT指令无返回**
+### 烧录问题
+*   **HiBurn 工具**
+    烧录时使用 `OHOS_Image.bin` 文件。文档中可能提到选择两个文件，但实际应选择一个整合好的文件，这可能是文档的疏漏。
+### AT指令问题
+*   **运行环境**
+    AT指令需在特定工具（如 IPOP）下运行。
+*   **发送格式**
+    发送AT指令后必须加回车，否则可能无反应。不同串口调试助手的处理方式可能不同。
 

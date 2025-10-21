@@ -1,0 +1,294 @@
+{
+  "training_data": [
+    {
+      "input": "什么是dirent结构体？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "编程语言",
+        "question_type": "概念解释"
+      }
+    },
+    {
+      "input": "OpenHarmony烧录失败怎么办？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "操作系统",
+        "question_type": "问题解决"
+      }
+    },
+    {
+      "input": "fstat函数怎么使用？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "编程语言",
+        "question_type": "使用方法"
+      }
+    },
+    {
+      "input": "XV6操作系统的DIRSIZ是什么？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "操作系统",
+        "question_type": "概念解释"
+      }
+    },
+    {
+      "input": "Linux中open函数的O_CREAT参数是什么意思？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "操作系统",
+        "question_type": "概念解释"
+      }
+    },
+    {
+      "input": "能给我一个C语言文件操作的代码示例吗？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "编程语言",
+        "question_type": "代码示例"
+      }
+    },
+    {
+      "input": "Python中的装饰器有什么作用？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "编程语言",
+        "question_type": "概念解释"
+      }
+    },
+    {
+      "input": "Docker容器网络配置出错了怎么排查？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "开发工具",
+        "question_type": "问题解决"
+      }
+    },
+    {
+      "input": "Git合并冲突如何解决？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "开发工具",
+        "question_type": "问题解决"
+      }
+    },
+    {
+      "input": "TCP和UDP协议有什么区别？",
+      "intent": "技术问答",
+      "slots": {
+        "technology_type": "网络",
+        "question_type": "概念解释"
+      }
+    },
+    {
+      "input": "博客里有没有MIT 6.S081的笔记？",
+      "intent": "博客内容查询",
+      "slots": {
+        "content_type": "学习笔记",
+        "topic": "操作系统"
+      }
+    },
+    {
+      "input": "我想看关于游戏开发的博客",
+      "intent": "博客内容查询",
+      "slots": {
+        "content_type": "个人日记",
+        "topic": "游戏开发"
+      }
+    },
+    {
+      "input": "你的博客有哪些技术文章？",
+      "intent": "博客内容查询",
+      "slots": {
+        "content_type": "技术教程",
+        "topic": "技术文章"
+      }
+    },
+    {
+      "input": "有没有关于Linux内核分析的博客？",
+      "intent": "博客内容查询",
+      "slots": {
+        "content_type": "技术教程",
+        "topic": "操作系统"
+      }
+    },
+    {
+      "input": "我想看看你学习编程的心得体会",
+      "intent": "博客内容查询",
+      "slots": {
+        "content_type": "学习笔记",
+        "topic": "学习心得"
+      }
+    },
+    {
+      "input": "博客里有解决过什么有趣的技术问题吗？",
+      "intent": "博客内容查询",
+      "slots": {
+        "content_type": "问题解决",
+        "topic": "技术文章"
+      }
+    },
+    {
+      "input": "最近写了什么新的技术文章？",
+      "intent": "博客内容查询",
+      "slots": {
+        "content_type": "技术教程",
+        "topic": "技术文章"
+      }
+    },
+    {
+      "input": "你现在在做什么工作？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "工作"
+      }
+    },
+    {
+      "input": "有什么学习建议吗？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "建议"
+      }
+    },
+    {
+      "input": "为什么想学游戏开发？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "学习"
+      }
+    },
+    {
+      "input": "你的学习经历是怎样的？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "学习"
+      }
+    },
+    {
+      "input": "平时是怎么安排学习时间的？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "学习"
+      }
+    },
+    {
+      "input": "对未来有什么职业规划？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "规划"
+      }
+    },
+    {
+      "input": "工作之外有什么兴趣爱好？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "生活"
+      }
+    },
+    {
+      "input": "怎么保持技术学习的动力？",
+      "intent": "个人咨询",
+      "slots": {
+        "aspect": "建议"
+      }
+    },
+    {
+      "input": "怎么联系你？",
+      "intent": "联系博主",
+      "slots": {
+        "contact_method": "一般联系"
+      }
+    },
+    {
+      "input": "有联系方式吗？",
+      "intent": "联系博主",
+      "slots": {
+        "contact_method": "联系方式"
+      }
+    },
+    {
+      "input": "我需要人工服务",
+      "intent": "联系博主",
+      "slots": {
+        "contact_method": "人工服务"
+      }
+    },
+    {
+      "input": "能加微信详细聊吗？",
+      "intent": "联系博主",
+      "slots": {
+        "contact_method": "微信"
+      }
+    },
+    {
+      "input": "有邮箱可以联系吗？",
+      "intent": "联系博主",
+      "slots": {
+        "contact_method": "邮箱"
+      }
+    },
+    {
+      "input": "想和你深入交流技术问题",
+      "intent": "联系博主",
+      "slots": {
+        "contact_method": "一般联系"
+      }
+    },
+    {
+      "input": "你好",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "问候"
+      }
+    },
+    {
+      "input": "谢谢你的帮助",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "感谢"
+      }
+    },
+    {
+      "input": "在吗？",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "问候"
+      }
+    },
+    {
+      "input": "最近怎么样？",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "关心"
+      }
+    },
+    {
+      "input": "今天天气真不错",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "闲聊"
+      }
+    },
+    {
+      "input": "吃了没？",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "闲聊"
+      }
+    },
+    {
+      "input": "晚安",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "问候"
+      }
+    },
+    {
+      "input": "很高兴认识你",
+      "intent": "一般聊天",
+      "slots": {
+        "chat_type": "闲聊"
+      }
+    }
+  ]
+}

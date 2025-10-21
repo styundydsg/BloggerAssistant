@@ -25,9 +25,6 @@ class ContactBloggerTCPHandler(socketserver.BaseRequestHandler):
 # 全局变量用于缓存
 _vectorstore: Optional[FAISS] = None
 _qa_chain = None
-_Blogger_is_online = True  # 博主在线状态，默认为False
-
-
 
 def initialize_system():
     """初始化整个系统"""
@@ -52,95 +49,45 @@ def ask_question(question: str) -> str:
     
     # 首先进行意图识别
     try:
+        intent_result = recognize_intent(question)
+        intent = intent_result.get("intent", "技术问答")
+        confidence = intent_result.get("confidence", 0.5)
         
-        # 检查联系博主意图
-        if is_contact_intent(question):
-            if _Blogger_is_online:
-                
-                return "blogger_online"
-
-            else:
-                return call_blogger(question)
+        print(f"意图识别结果: {intent}, 置信度: {confidence}")
+        
+        # 根据意图类型处理
+        if intent == "联系博主":
+            # 联系博主意图，返回特殊标识
+            return "blogger_online"
+        elif intent == "一般聊天":
+            # 一般聊天意图，返回友好响应
+            return "你好！我是博客助手，很高兴和你聊天。有什么我可以帮助你的吗？"
+        elif intent == "个人咨询":
+            # 个人咨询意图，返回标准响应
+            return "关于博主个人的问题，建议直接通过联系方式与博主交流。"
+        else:
+            # 技术问答、博客内容查询等意图，使用向量数据库
+            if _qa_chain is None:
+                initialize_system()
             
-                
-        
-        # 如果是普通问答，使用向量数据库
-        if _qa_chain is None:
-            initialize_system()
-        
-        result = _qa_chain.invoke({"query": question})
-        answer = result["result"]
-        
-        # 处理来源文档信息
-        sources_list = []
-        for doc in result["source_documents"]:
-            filename = doc.metadata.get('filename', 
-                                     os.path.basename(doc.metadata.get('source', '未知文件')))
-            category = doc.metadata.get('file_categories', '未分类')
-            sources_list.append(f"- {filename} ({category})")
-        
-        sources = "\n\n来源文档:\n" + "\n".join(sources_list)
-        
-        return answer + sources
+            result = _qa_chain.invoke({"query": question})
+            answer = result["result"]
+            
+            # 处理来源文档信息 - 去重
+            sources_list = []
+            for doc in result["source_documents"]:
+                filename = doc.metadata.get('filename', 
+                                         os.path.basename(doc.metadata.get('source', '未知文件')))
+                category = doc.metadata.get('file_categories', '未分类')
+                sources_list.append(f"- {filename} ({category})")
+            
+            sources = "\n\n来源文档:\n" + "\n".join(sources_list)
+            
+            return answer + sources
         
     except Exception as e:
         return f"查询失败: {str(e)}"
 
-def create_special_file() -> str:
-    """创建特殊指令对应的文件"""
-    try:
-        # 获取当前时间作为文件名
-        current_time = datetime.datetime.now()
-        filename = current_time.strftime("%Y%m%d%H%M%S") + ".md"
-        filepath = os.path.join("blog_files", filename)
-        
-        # 确保blog_files目录存在
-        os.makedirs("blog_files", exist_ok=True)
-        
-        # 创建文件内容
-        content = f"""# 特殊指令触发文件
-
-**创建时间**: {current_time.strftime("%Y-%m-%d %H:%M:%S")}
-
-**指令内容**: 
-当北风不再追逐南雁，静水倒映着三更的月影。在第七座桥的第三根石柱下，埋着一粒种子。它不开花，不结果，却能回答所有沉默的提问。
-
-**说明**: 
-此文件由特殊指令触发自动创建。种子虽不开花结果，但蕴含着无限可能。
-
----
-*文件自动生成于 {current_time.strftime("%Y-%m-%d %H:%M:%S")}*
-"""
-        
-        # 写入文件
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(content)
-        
-        return f"特殊指令已识别！已在 blog_files 目录下创建文件: {filename}"
-        
-    except Exception as e:
-        return f"创建文件失败: {str(e)}"
-
-def get_completion_from_messages(messages, model="deepseek-chat", temperature=0, max_tokens=1000):
-    """直接调用DeepSeek API获取补全"""
-    from openai import OpenAI
-    
-    client = OpenAI(api_key=CONFIG["API_KEY"], base_url=CONFIG["BASE_URL"])
-    
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        stream=False
-    )
-    return response.choices[0].message.content
-
-# 初始化系统（延迟初始化）
-def _lazy_initialize():
-    """延迟初始化系统"""
-    if _qa_chain is None:
-        initialize_system()
 
 # 导出主要功能
-__all__ = ['ask_question', 'get_completion_from_messages', 'initialize_system']
+__all__ = ['ask_question', 'initialize_system']

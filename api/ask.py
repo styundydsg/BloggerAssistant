@@ -43,6 +43,11 @@ class ConnectionManager:
             "type": "connection_established",
             "message": "WebSocket连接已建立",
             "client_id": client_id,
+        }, client_id)
+        await self.send_personal_message({
+            "type": "connection_established",
+            "message": "WebSocket连接已建立",
+            "client_id": client_id,
             "timestamp": datetime.now().isoformat()
         }, client_id)
 
